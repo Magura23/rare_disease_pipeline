@@ -106,7 +106,7 @@ class MedGemmaExtractor:
 
         has_cuda = torch.cuda.is_available()
         dtype = torch.float16 if has_cuda else torch.float32
-
+        attn_impl = "eager"
         if has_cuda:
             # GPU path
             self.model = AutoModelForCausalLM.from_pretrained(
@@ -120,7 +120,7 @@ class MedGemmaExtractor:
                 "text-generation",
                 model=self.model,
                 tokenizer=self.tokenizer,
-                max_new_tokens=256,   
+                max_new_tokens=128,   
             )
         else:
             # CPU path
@@ -137,7 +137,7 @@ class MedGemmaExtractor:
                 model=self.model,
                 tokenizer=self.tokenizer,
                 device=-1,            # CPU
-                max_new_tokens=256,   
+                max_new_tokens=128,   
             )
 
         print(f"CUDA available? {has_cuda} | dtype={dtype}")
