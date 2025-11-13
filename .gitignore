@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Environment variables
+.env
+
+# VS Code
+.vscode/
+
+# Data directories
+data/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+
+/src/rarekg/paper_filter
+/src/rarekg/pubmed
+src/rarekg/curated/working1.ipynb
+src/rarekg/curated/db_construction.py
+
+notebooks/medgemma_setup

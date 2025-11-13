@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rarekg"                 # import name is the folder under src/
+version = "0.0.1"
+requires-python = "=3.11"
+
+[tool.setuptools]
+package-dir = {"" = "src"}      # tell setuptools your code lives in src/
+
+[tool.setuptools.packages.find]
+where = ["src"]                  # discover packages under src/
+
+# Optional: run "python -m rarekg" or provide a CLI name:
+[project.scripts]
+rarekg = "rarekg.__main__:main"
