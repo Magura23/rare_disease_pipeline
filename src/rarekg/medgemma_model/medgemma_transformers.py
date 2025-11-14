@@ -140,7 +140,7 @@ def chat(model, tok, messages):
     with torch.inference_mode():
         out_ids = model.generate(
             **enc,
-            max_new_tokens=1000, # might affect the outputs 
+            max_new_tokens=400, # might affect the outputs 
             do_sample=False,               
             top_p=1.0,
             repetition_penalty=1.0,

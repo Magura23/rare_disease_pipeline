@@ -203,3 +203,70 @@ def download_umls_mrconso(api_key: str):
         raise RuntimeError("MRCONSO.RRF not found inside the downloaded zip.")
 
     return zip_path, rrf_path
+
+
+
+
+def download_umls_mrsty(api_key: str, allow_full_fallback: bool = True):
+    """
+    Download the *current* UMLS MRSTY file via UTS and extract MRSTY.RRF.
+    Tries the MRSTY-only artifact first; if missing and allow_full_fallback=True,
+    falls back to the full Metathesaurus package and extracts MRSTY.RRF.
+    Returns (zip_path, rrf_path).
+    """
+    base_dir = DOWNLOAD_DIR
+    base_dir.mkdir(parents=True, exist_ok=True)
+
+    releases_url = "https://uts-ws.nlm.nih.gov/releases"
+    dl_api = "https://uts-ws.nlm.nih.gov/download"
+
+    # 1) Try MRSTY-only artifact
+    r = requests.get(releases_url, params={
+        "releaseType": "umls-metathesaurus-mrsty-file",
+        "current": "true"
+    }, timeout=60)
+    r.raise_for_status()
+    items = r.json()
+    if isinstance(items, list) and items and "downloadUrl" in items[0]:
+        source_url = items[0]["downloadUrl"]
+        zip_path = base_dir / Path(source_url).name
+        fetch_file(dl_api, zip_path, params={"url": source_url, "apiKey": api_key})
+
+        with zipfile.ZipFile(zip_path, "r") as zf:
+            rrf_path = None
+            for name in zf.namelist():
+                if name.endswith("MRSTY.RRF"):
+                    rrf_path = base_dir / "MRSTY.RRF"
+                    with zf.open(name) as src, open(rrf_path, "wb") as dst:
+                        dst.write(src.read())
+                    break
+        if rrf_path is None:
+            raise RuntimeError("MRSTY.RRF not found inside the MRSTY zip.")
+        return zip_path, rrf_path
+
+    # 2) Optional fallback: Full Metathesaurus zip
+    if not allow_full_fallback:
+        raise RuntimeError("No MRSTY-only artifact available and fallback disabled.")
+
+    r = requests.get(releases_url, timeout=60)
+    r.raise_for_status()
+    all_items = r.json()
+    # pick the latest "full" metathesaurus package
+    full = next(x for x in sorted(all_items, key=lambda d: d.get("releaseDate",""), reverse=True)
+                if "metathesaurus" in x.get("releaseType","").lower()
+                and "full" in x.get("releaseType","").lower())
+    source_url = full["downloadUrl"]
+    zip_path = base_dir / Path(source_url).name
+    fetch_file(dl_api, zip_path, params={"url": source_url, "apiKey": api_key})
+
+    with zipfile.ZipFile(zip_path, "r") as zf:
+        rrf_path = None
+        for name in zf.namelist():
+            if name.endswith("MRSTY.RRF"):
+                rrf_path = base_dir / "MRSTY.RRF"
+                with zf.open(name) as src, open(rrf_path, "wb") as dst:
+                    dst.write(src.read())
+                break
+    if rrf_path is None:
+        raise RuntimeError("MRSTY.RRF not found inside the FULL UMLS zip.")
+    return zip_path, rrf_path
