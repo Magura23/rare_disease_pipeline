@@ -140,6 +140,9 @@ class EntityType(str, Enum):
     phenotype = "phenotype"
     treatment = "treatment"
     drug  = "drug"
+    
+    def __str__(self):
+        return self.value  
 
 
 class Entity(BaseModel):
@@ -240,43 +243,7 @@ AUDIT_SCHEMA = {
   "additionalProperties": False
 }
 
-# AUDIT_SCHEMA = {
-#   "type": "object",
-#   "required": ["audit"],
-#   "properties": {
-#     "audit": {
-#       "type": "array",
-#       "items": {
-#         "type": "object",
-#         "required": ["candidate_text","kept","rule_checks"],
-#         "properties": {
-#           "candidate_text": {"type":"string"},
-#           "decided_type": {"type":"string", "enum": ["rare_disease","gene","genotype","phenotype","treatment", "drug", None]},
-#           "kept": {"type":"boolean"},
-#           "reason": {"type":"string"},
-#           "normalization_before": {"type":"string"},
-#           "normalization_after": {"type":"string"},
-#           "dedupe_key": {"type":"string"},
-#           "rule_checks": {
-#             "type":"array",
-#             "items": {
-#               "type":"object",
-#               "required":["rule_id","passed"],
-#               "properties":{
-#                 "rule_id":{"type":"string"},
-#                 "passed":{"type":"boolean"},
-#                 "note":{"type":"string"}
-#               },
-#               "additionalProperties": False
-#             }
-#           }
-#         },
-#         "additionalProperties": False
-#       }
-#     }
-#   },
-#   "additionalProperties": False
-# }
+
 
 ENTITIES_ARRAY_SCHEMA = {
     "type": "array",
@@ -378,62 +345,7 @@ FEW_SHOT_PROD: Sequence[Dict[str, str]] = [
     },
 ]
 
-FEW_SHOT_AUDIT: Sequence[Dict[str, str]] = [
-    {
-        "role": "user",
-        "content": "Alpha-mannosidosis is an autosomal recessive lysosomal storage disease. Patients often receive enzyme replacement therapy."
-    },
-    {
-        "role": "assistant",
-        "content": json.dumps({
-            "audit": [
-                {
-                    "candidate_text": "Alpha-mannosidosis",
-                    "decided_type": "rare_disease",
-                    "kept": True,
-                    "reason": "accepted",
-                    "normalization_before": "Alpha-mannosidosis",
-                    "normalization_after": "alpha-mannosidosis",
-                    "dedupe_key": "rare_disease|alpha-mannosidosis",
-                    "rule_checks": [
-                        {"rule_id":"IDENT.rare_disease.1","passed":True,"note":"concrete rare disorder"},
-                        {"rule_id":"NORM.rare_disease.1","passed":True,"note":"lowercase + collapse spaces"},
-                        {"rule_id":"VALID.rare_disease.1","passed":True,"note":"not a broad class"},
-                        {"rule_id":"EMIT.rare_disease.1","passed":True,"note":"emitted"}
-                    ]
-                },
-                {
-                    "candidate_text": "enzyme replacement therapy",
-                    "decided_type": "treatment",
-                    "kept": True,
-                    "reason": "accepted",
-                    "normalization_before": "enzyme replacement therapy",
-                    "normalization_after": "enzyme replacement therapy",
-                    "dedupe_key": "treatment|enzyme replacement therapy",
-                    "rule_checks": [
-                        {"rule_id":"IDENT.treatment.1","passed":True,"note":"therapy strategy/class"},
-                        {"rule_id":"NORM.treatment.1","passed":True,"note":"lowercase + collapse spaces"},
-                        {"rule_id":"VALID.treatment.1","passed":True,"note":"ERT allowed"},
-                        {"rule_id":"EMIT.treatment.1","passed":True,"note":"emitted"}
-                    ]
-                },
-                {
-                    "candidate_text": "autosomal recessive",
-                    "decided_type": None,
-                    "kept": False,
-                    "reason": "discarded: inheritance bucket, not phenotype",
-                    "normalization_before": "autosomal recessive",
-                    "normalization_after": "autosomal recessive",
-                    "dedupe_key": "skip",
-                    "rule_checks": [
-                        {"rule_id":"IDENT.phenotype.1","passed":False,"note":"this is inheritance, not a phenotypic abnormality"},
-                        {"rule_id":"EMIT.phenotype.1","passed":False,"note":"not emitted"}
-                    ]
-                }
-            ]
-        })
-    }
-]
+
 
 
 def build_prod_messages(text: str, use_few_shot: bool = True) -> List[Dict[str, str]]:
@@ -442,19 +354,10 @@ def build_prod_messages(text: str, use_few_shot: bool = True) -> List[Dict[str, 
         msgs.extend(FEW_SHOT_PROD)
     msgs.append({
         "role": "user",
-        "content": f"Extract entities from the passage below and return exactly one JSON object:\n\n{text}"
+        "content": f"Extract all relevant biomedical entities from the following text:\n\n{text}"
     })
     return msgs
 
-def build_audit_messages(text: str, use_few_shot: bool = True) -> List[Dict[str, str]]:
-    msgs: List[Dict[str, str]] = [{"role": "system", "content": SYSTEM_SGR_AUDIT}]
-    if use_few_shot:
-        msgs.extend(FEW_SHOT_AUDIT)
-    msgs.append({
-        "role": "user",
-        "content": f"Audit the entity extraction for the passage below. Output ONLY the audit JSON:\n\n{text}"
-    })
-    return msgs
 
 
 def _call_with_schema(
@@ -463,7 +366,7 @@ def _call_with_schema(
     messages: List[Dict[str, str]],
     schema: Dict[str, Any],
     use_response_format: bool = True,   # set False to use guided_json
-    max_tokens: int = 1200
+    max_tokens: int = 600
 ) -> str:
     if use_response_format:
         comp = client.chat.completions.create(
@@ -497,28 +400,4 @@ def extract_entities(
     except (json.JSONDecodeError, ValidationError):
         return ExtractionResult(entities=[])
 
-def extract_entities_with_audit(
-    text: str,
-    client: OpenAI,
-    model: str = "medgemma",
-    use_few_shot: bool = True,
-    use_response_format: bool = False,
-) -> Tuple[ExtractionResult, AuditReport]:
-    prod_msgs = build_prod_messages(text, use_few_shot=use_few_shot)
-    raw_prod = _call_with_schema(
-        client, model, prod_msgs, JSON_SCHEM, use_response_format=use_response_format
-    )
-    try:
-        prod = ExtractionResult.model_validate(json.loads(raw_prod))
-    except (json.JSONDecodeError, ValidationError):
-        prod = ExtractionResult(entities=[])
 
-    audit_msgs = build_audit_messages(text, use_few_shot=use_few_shot)
-    raw_audit = _call_with_schema(
-        client, model, audit_msgs, AUDIT_SCHEMA, use_response_format=use_response_format
-    )
-    try:
-        audit = AuditReport.model_validate(json.loads(raw_audit))
-    except (json.JSONDecodeError, ValidationError):
-        audit = AuditReport(audit=[])
-    return prod, audit
