@@ -39,5 +39,6 @@ src/rarekg/curated/working1.ipynb
 src/rarekg/curated/db_construction.py
 
 notebooks/medgemma_setup
+notebooks/server.ipynb
 
 vllm
