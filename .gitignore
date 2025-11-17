@@ -34,7 +34,7 @@ data/
 
 
 /src/rarekg/paper_filter
-/src/rarekg/pubmed
+
 src/rarekg/curated/working1.ipynb
 src/rarekg/curated/db_construction.py
 
