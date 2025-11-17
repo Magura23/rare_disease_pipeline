@@ -10,7 +10,6 @@ def find_project_root(start: Path | None = None, markers=MARKERS) -> Path:
     for parent in [cur, *cur.parents]:
         if any((parent / m).exists() for m in markers):
             return parent
-    # fallback: if nothing matched, use the starting dir
     return cur
 
 

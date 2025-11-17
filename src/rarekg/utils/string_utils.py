@@ -16,7 +16,7 @@ _ROMAN_TO_INT = {
 
 
 
-def normalize_disease_name(name: str) -> str:
+def normalize_name(name: str) -> str:
    
     s = unicodedata.normalize("NFKC", name)
 
