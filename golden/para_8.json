@@ -1,0 +1,7 @@
+{
+    "entities":[
+        { "name": "Joubert syndrome", "type": "rare_disease" },
+        { "name": "AHI1", "type": "gene" }
+]
+
+}

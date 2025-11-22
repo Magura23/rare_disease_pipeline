@@ -1,0 +1,22 @@
+{
+    "entities":[
+
+  { "name": "neonatal hypotonia",              "type": "phenotype" },
+  { "name": "abnormal eye movements",          "type": "phenotype" },
+  { "name": "ocular motor apraxia",            "type": "phenotype" },
+  { "name": "breathing dysregulation",         "type": "phenotype" },
+  { "name": "apneas",                          "type": "phenotype" },
+  { "name": "hyperpneas",                      "type": "phenotype" },
+  { "name": "delay of developmental milestones","type": "phenotype" },
+  { "name": "ataxia",                          "type": "phenotype" },
+  { "name": "broad-based gait",                "type": "phenotype" },
+  { "name": "unsteady gait",                   "type": "phenotype" },
+  { "name": "difficulty running",              "type": "phenotype" },
+  { "name": "difficulty climbing stairs",      "type": "phenotype" },
+  { "name": "intellectual disability",         "type": "phenotype" },
+  { "name": "vermis hypoplasia",               "type": "phenotype" },
+  { "name": "expressive speech impairment",    "type": "phenotype" },
+  { "name": "oral-motor apraxia",              "type": "phenotype" }
+]
+
+}

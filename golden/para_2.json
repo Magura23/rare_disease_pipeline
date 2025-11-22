@@ -1,0 +1,12 @@
+{
+    "entities":[
+            { "name": "hypotonia", "type": "phenotype" },
+            { "name": "abnormal eye movements", "type": "phenotype" },
+            { "name": "ocular motor apraxia", "type": "phenotype" },
+            { "name": "developmental delay", "type": "phenotype" },
+            { "name": "episodic breathing dysregulation", "type": "phenotype" },
+            { "name": "cerebellar ataxia", "type": "phenotype" },
+            { "name": "cognitive impairment", "type": "phenotype" },
+            { "name": "facial dysmorphisms", "type": "phenotype" }
+    ]
+}

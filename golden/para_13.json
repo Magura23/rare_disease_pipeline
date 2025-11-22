@@ -1,0 +1,23 @@
+{
+    "entities":
+    [
+
+        { "name": "cortical heterotopias",            "type": "phenotype" },
+        { "name": "midbrain heterotopias",            "type": "phenotype" },
+        { "name": "cervicomedullary heterotopias",    "type": "phenotype" },
+        { "name": "polymicrogyria",                   "type": "phenotype" },
+        { "name": "fronto-temporal pachygyria",       "type": "phenotype" },
+        { "name": "macrogyria",                       "type": "phenotype" },
+
+        { "name": "AHI1",      "type": "gene" },
+        { "name": "CC2D2A",    "type": "gene" },
+        { "name": "CSSP1",     "type": "gene" },
+        { "name": "KIAA0586",  "type": "gene" },
+        { "name": "OFD1",      "type": "gene" },
+        { "name": "PIBF1",     "type": "gene" },
+        { "name": "RPGRIP1L",  "type": "gene" },
+        { "name": "TCTN1",     "type": "gene" },
+        { "name": "SUFU",      "type": "gene" }
+]
+
+}

@@ -1,0 +1,10 @@
+{
+    "entities":[
+        { "name": "occipital encephalocele", "type": "phenotype" },
+        { "name": "ventriculomegaly", "type": "phenotype" },
+        { "name": "dysgenesis of the corpus callosum", "type": "phenotype" },
+        { "name": "neural migration defects", "type": "phenotype" },
+        { "name": "hypothalamic hamartoma", "type": "phenotype" }
+    ]
+
+}

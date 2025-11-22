@@ -1,0 +1,13 @@
+{
+    "entities":[
+ 
+            { "name": "Meckel syndrome", "type": "rare_disease" },
+            { "name": "isolated nephronophthisis", "type": "rare_disease" },
+            { "name": "Leber congenital amaurosis", "type": "rare_disease" },
+            { "name": "oral-facial-digital syndromes", "type": "rare_disease" },
+            { "name": "Bardet-Biedl syndrome", "type": "rare_disease" },
+
+            { "name": "OFD1", "type": "gene" },
+            { "name": "SUFU", "type": "gene" }
+]
+}

@@ -1,0 +1,16 @@
+{
+    "entities":[
+
+        { "name": "Joubert syndrome", "type": "rare_disease" },
+        { "name": "midbrain–hindbrain junction malformation", "type": "phenotype" },
+        { "name": "molar tooth sign", "type": "phenotype" },
+        { "name": "cerebellar hypoplasia", "type": "phenotype" },
+        { "name": "vermian dysplasia", "type": "phenotype" },
+        { "name": "thick superior cerebellar peduncles", "type": "phenotype" },
+        { "name": "horizontally oriented superior cerebellar peduncles", "type": "phenotype" },
+        { "name": "abnormally deep interpeduncular fossa", "type": "phenotype" },
+        { "name": "cerebellar malformations", "type": "phenotype" },
+        { "name": "brainstem malformations", "type": "phenotype" }
+]
+
+}

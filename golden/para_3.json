@@ -1,0 +1,25 @@
+{
+    "entities":[
+            { "name": "Purely neurological JS", "type": "rare_disease" },
+            { "name": "JS with ocular involvement", "type": "rare_disease" },
+            { "name": "JS with renal involvement", "type": "rare_disease" },
+            { "name": "JS with oculorenal involvement", "type": "rare_disease" },
+            { "name": "JS with hepatic involvement", "type": "rare_disease" },
+            { "name": "COACH syndrome", "type": "rare_disease" },
+            { "name": "JS with orofaciodigital involvement", "type": "rare_disease" },
+            { "name": "OFDVI syndrome", "type": "rare_disease" },
+            { "name": "JS with acrocallosal features", "type": "rare_disease" },
+            { "name": "JS with Jeune asphyxiating thoracic dystrophy", "type": "rare_disease" },
+            { "name": "Jeune asphyxiating thoracic dystrophy", "type": "rare_disease" },
+
+            { "name": "polydactyly", "type": "phenotype" },
+            { "name": "preaxial polydactyly", "type": "phenotype" },
+            { "name": "mesoaxial polydactyly", "type": "phenotype" },
+            { "name": "postaxial polydactyly", "type": "phenotype" },
+            { "name": "corpus callosum abnormalities", "type": "phenotype" },
+            { "name": "hydrocephalus", "type": "phenotype" },
+            { "name": "encephalocele", "type": "phenotype" },
+            { "name": "polymicrogyria", "type": "phenotype" }
+]
+
+}

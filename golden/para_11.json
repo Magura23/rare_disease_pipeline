@@ -1,0 +1,8 @@
+{
+    "entities":[
+        { "name": "encephalocele", "type": "phenotype" },
+        { "name": "OFD1", "type": "gene" },
+        { "name": "TCTN2", "type": "gene" }
+]
+
+}

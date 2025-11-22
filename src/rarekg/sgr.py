@@ -73,7 +73,12 @@ JSON_RELATION_SCHEMA: Dict[str, Any] = {
                     "type": {
                         "type": "string",
                         "enum": [
-                                c
+                            "disease_gene",
+                            "disease_genotype",
+                            "disease_phenotype",
+                            "disease_drug",
+                            "disease_treatment",
+                            "genotype_gene"
                         ],
                     },
                 },
@@ -130,7 +135,7 @@ SGR_ALL_PROMPT = """
 
     INTERNAL SGR LOOP (keep private; do not output):
     
-    1. IDENTIFY candidates by type:
+    1. IDENTIFY candidates by type with its canonical name:
         - rare_disease: named rare disorders (Orphanet-style labels; prevalence < 1/2000 or clearly used as a specific rare condition).
         - gene: HGNC-like symbols in ALL-CAPS (optionally with digits/hyphen) or explicit gene phrases (e.g. " breast cancer 1 gene").
         - genotype: HGVS-style sequence variants only (e.g. "c.123A>G", "NM_000123.3:c.123A>G").
@@ -149,8 +154,11 @@ SGR_ALL_PROMPT = """
         - genotype matches: valid if matches formats: c.* or NM_*:c.* 
         
         - phenotype is a phenotypic abnormality; without clinical modifiers/course, inheritence, frequency; 
-            in case of shared-head coordinated phenotype mentions, split into separate phenotypes
+          In case of shared-head coordinated phenotype mentions, split into separate phenotypes
+          
+            
         - treatment is therapy strategy/management
+        
         - drug is concrete medicinal product/substance
         
         
@@ -190,12 +198,12 @@ SGR_Pheno_PROMPT = """
 
     INTERNAL SGR LOOP (keep private; do not output):
     
-    1. IDENTIFY candidates by type:
-        - phenotype: specific phenotypic abnormalities; without modifiers, inheritance, frequency.
+    1. IDENTIFY phenotypes:
+        - specific phenotypic abnormalities; without modifiers, inheritance, frequency.
                 
     2. VALIDATE(soft checks; silently discard failures)
         - phenotype is a phenotypic abnormality; without clinical modifiers/course, inheritence, frequency; 
-            in case of shared-head coordinated phenotype mentions, split into separate phenotypes
+            In case of shared-head coordinated phenotype mentions, split into separate phenotypes
 
     3. EMIT
          Output the validated entities. If nothing valid, output exactly: {"entities":[]}
@@ -220,6 +228,41 @@ SGR_treatment_PROMPT = """
 """
 
 FEW_SHOT_ALL: Sequence[Dict[str, str]] = [
+    {
+        "role": "user",
+        "content": (
+            "Affected patients typically show hearing impairment, progressive neuropsychological decline,"
+            "ataxia, dysarthria, dyspraxia, coarse facial features and skeletal abnormalities such as"
+            "spine and vertebral deformities, scoliosis, pes planus, hip dysplasia and knock knees (genu valgus)"
+            "which often lead to arthropathy, splenomegaly, frequent infections and psychiatric symptoms. "
+            "(Malm et al., 2000, 2005; Malm and Nilssen, 2008)."
+        ),
+    },
+    {
+        "role": "assistant",
+        "content": json.dumps(
+            {
+                "entities": [
+                    {"name": "hearing impairment", "type": "phenotype"},
+                    {"name": "neuropsychological decline", "type": "phenotype"},
+                    {"name": "ataxia", "type": "phenotype"},
+                    {"name": "dysarthria", "type": "phenotype"},
+                    {"name": "dyspraxia", "type": "phenotype"},
+                    {"name": "coarse facial feature", "type": "phenotype"},
+                    {"name": "spine deformities", "type": "phenotype"},
+                    {"name": "vertebral deformities", "type": "phenotype"},
+                    {"name": "scoliosis", "type": "phenotype"},
+                    {"name": "pes planus", "type": "phenotype"},
+                    {"name": "hip dysplasia", "type": "phenotype"},
+                    {"name": " knock knees (genu valgus)", "type": "phenotype"},
+                    {"name": "arthropathy", "type": "phenotype"},
+                    {"name": "splenomegaly", "type": "phenotype"},
+                    {"name": "frequent infections", "type": "phenotype"},
+                ]
+            }
+            
+        ),
+    },
     {
         "role": "user",
         "content": (
@@ -368,7 +411,9 @@ FEW_SHOT_ALL: Sequence[Dict[str, str]] = [
                     },
                     {"name": "c.617G>A", "type": "genotype"},
                     {"name": "malformation of the great toe", "type": "phenotype"},
-                    {"name": "extra-skeletal ossification", "type": "phenotype"},
+                    {"name": "extra-skeletal ossification of ligaments", "type": "phenotype"},
+                    {"name": "extra-skeletal ossification of tendons", "type": "phenotype"},
+                    {"name": "extra-skeletal ossification of muscles", "type": "phenotype"},
                 ]
             }
         ),
@@ -475,66 +520,147 @@ FEW_SHOT_RD: Sequence[Dict[str, str]] = [
 FEW_SHOT_pheno: Sequence[Dict[str, str]] = [
     {
         "role": "user",
-        "content": "Loss-of-function (LOF) mutations in CASK cause severe developmental phenotypes, including microcephaly with pontine and cerebellar hypoplasia, X-linked intellectual disability, and autism. We detected NM_004006.2:c.4375C>T in CASK."
+        "content": (
+            "Loss-of-function (LOF) mutations in CASK cause severe developmental "
+            "phenotypes, including microcephaly with pontine and cerebellar hypoplasia, "
+            "X-linked intellectual disability, and autism. We detected NM_004006.2:c.4375C>T in CASK."
+        ),
     },
     {
         "role": "assistant",
-        "content": json.dumps({
-            "entities": [
-                {"name": "intellectual disability", "type": "phenotype"},
-                {"name": "autism", "type": "phenotype"},
-            ]
-        })
+        "content": json.dumps(
+            {
+                "entities": [
+                    {"name": "intellectual disability", "type": "phenotype"},
+                    {"name": "autism", "type": "phenotype"},
+                ]
+            }
+        ),
+    },
+       {
+        "role": "user",
+        "content": (
+            "Affected patients typically show hearing impairment, progressive neuropsychological decline,"
+            "ataxia, dysarthria, dyspraxia, coarse facial features and skeletal abnormalities such as"
+            "spine and vertebral deformities, scoliosis, pes planus, hip dysplasia and knock knees (genu valgus)"
+            "which often lead to arthropathy, splenomegaly, frequent infections and psychiatric symptoms. "
+            "(Malm et al., 2000, 2005; Malm and Nilssen, 2008)."
+        ),
+    },
+    {
+        "role": "assistant",
+        "content": json.dumps(
+            {
+                "entities": [
+                    {"name": "hearing impairment", "type": "phenotype"},
+                    {"name": "neuropsychological decline", "type": "phenotype"},
+                    {"name": "ataxia", "type": "phenotype"},
+                    {"name": "dysarthria", "type": "phenotype"},
+                    {"name": "dyspraxia", "type": "phenotype"},
+                    {"name": "coarse facial feature", "type": "phenotype"},
+                    {"name": "spine deformities", "type": "phenotype"},
+                    {"name": "vertebral deformities", "type": "phenotype"},
+                    {"name": "scoliosis", "type": "phenotype"},
+                    {"name": "pes planus", "type": "phenotype"},
+                    {"name": "hip dysplasia", "type": "phenotype"},
+                    {"name": " knock knees (genu valgus)", "type": "phenotype"},
+                    {"name": "arthropathy", "type": "phenotype"},
+                    {"name": "splenomegaly", "type": "phenotype"},
+                    {"name": "frequent infections", "type": "phenotype"},
+                ]
+            }
+            
+        ),
     },
     {
         "role": "user",
-        "content": "We observed severe muscular hypotonia and ptosis. Treatment was initiated with alglucosidase alfa and miglustat."
+        "content": (
+            "We observed severe muscular hypotonia and ptosis. Treatment was initiated "
+            "with alglucosidase alfa and miglustat."
+        ),
     },
     {
         "role": "assistant",
-        "content": json.dumps({
-            "entities": [
-                {"name": "hypotonia", "type": "phenotype"},
-                {"name": "ptosis", "type": "phenotype"},
-            ]
-        })
+        "content": json.dumps(
+            {
+                "entities": [
+                    {"name": "hypotonia", "type": "phenotype"},
+                    {"name": "ptosis", "type": "phenotype"},
+                ]
+            }
+        ),
     },
     {
         "role": "user",
-        "content": "Patients with Joubert syndrome with renal involvement show cerebellar and brainstem malformations."
+        "content": (
+            "Patients with Joubert syndrome with renal involvement show cerebellar "
+            "and brainstem malformations."
+        ),
     },
     {
         "role": "assistant",
-        "content": json.dumps({
-            "entities": [
-                {"name": "cerebellar malformation", "type": "phenotype"},
-                {"name": "brainstem malformation", "type": "phenotype"}
-            ]
-        })
+        "content": json.dumps(
+            {
+                "entities": [
+                    {"name": "cerebellar malformation", "type": "phenotype"},
+                    {"name": "brainstem malformation", "type": "phenotype"},
+                ]
+            }
+        ),
     },
     {
         "role": "user",
-        "content": "The RNA exosome is an evolutionarily conserved, multi-subunits ribonuclease complex that is critical for processing and/or degrading a variety of RNA molecules."
+        "content": (
+            "The RNA exosome is an evolutionarily conserved, multi-subunits "
+            "ribonuclease complex that is critical for processing and/or degrading "
+            "a variety of RNA molecules."
+        ),
     },
     {
         "role": "assistant",
-        "content": json.dumps({
-            "entities": []
-        })
+        "content": json.dumps({"entities": []}),
     },
     {
         "role": "user",
-        "content": "Fibrodysplasia ossificans progressiva, which mostly displayed the mutation c.617G>A, p.R206H, is characterized by congenital malformation of the great toe and progressive extra-skeletal ossification of ligaments, tendons and muscles."
+        "content": (
+            "Fibrodysplasia ossificans progressiva, which mostly displayed the "
+            "mutation c.617G>A, p.R206H, is characterized by congenital malformation "
+            "of the great toe and progressive extra-skeletal ossification of "
+            "ligaments, tendons and muscles."
+        ),
     },
     {
         "role": "assistant",
-        "content": json.dumps({
-            "entities": [
-                {"name": "malformation of the great toe", "type": "phenotype"},
-                {"name": "extra-skeletal ossification", "type": "phenotype"},   
-            ]
-        })
-    }
+        "content": json.dumps(
+            {
+                "entities": [
+                    {"name": "malformation of the great toe", "type": "phenotype"},
+                    {"name": "extra-skeletal ossification of ligaments", "type": "phenotype"},
+                    {"name": "extra-skeletal ossification of tendons", "type": "phenotype"},
+                    {"name": "extra-skeletal ossification of muscles", "type": "phenotype"},
+                ]
+            }
+        ),
+    },
+    {
+        "role": "user",
+        "content": (
+            "Cystic fibrosis is caused by biallelic variants in CFTR. "
+            "The common F508del mutation leads to progressive bronchiectasis, "
+            "and some patients respond to ivacaftor."
+        ),
+    },
+    {
+        "role": "assistant",
+        "content": json.dumps(
+            {
+                "entities": [
+                    {"name": "bronchiectasis", "type": "phenotype"},
+                   
+                ]
+            }
+        ),
+    },
 ]
 FEW_SHOT_treatment: Sequence[Dict[str, str]] = [
     {
@@ -737,31 +863,15 @@ def extract_entities(
     text: str,
     client: OpenAI,
     model: str = "medgemma",
-    entity_group: str = "all",  # "all", "rare_disease", "phenotype", "treatment"
-    use_few_shot: bool = True,
+    system_prompt: Optional[str] = SGR_ALL_PROMPT,
+    few_shot: Optional[str] = FEW_SHOT_ALL,
     use_response_format: bool = False,  # vLLM you usually want False
 ) -> ExtractionResult:
 
-    if entity_group == "all":
-        system = SGR_ALL_PROMPT
-        examples = FEW_SHOT_ALL
-    elif entity_group == "rare_disease":
-        system = SGR_RD_PROMPT
-        examples = FEW_SHOT_RD
-    elif entity_group == "phenotype":
-        system = SGR_Pheno_PROMPT
-        examples = FEW_SHOT_pheno
-    elif entity_group == "treatment":
-        system = SGR_treatment_PROMPT
-        examples = FEW_SHOT_treatment
-    else:
-        raise ValueError(f"Unknown entity_group: {entity_group}")
-
     messages = build_prod_messages(
         text=text,
-        system=system,
-        examples=examples,
-        use_few_shot=use_few_shot,
+        system=system_prompt,
+        examples=few_shot,
     )
 
     raw = _call_with_schema(

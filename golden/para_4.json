@@ -1,0 +1,8 @@
+{
+    "entities":[
+        { "name": "Joubert syndrome related disorders", "type": "rare_disease" },
+        { "name": "Joubert syndrome", "type": "rare_disease" },
+        { "name": "molar tooth sign", "type": "phenotype" }
+]
+
+}

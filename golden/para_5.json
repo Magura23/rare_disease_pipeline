@@ -1,0 +1,13 @@
+{
+    "entities":[
+
+        { "name": "CPLANE1",  "type": "gene" },
+        { "name": "CC2D2A",   "type": "gene" },
+        { "name": "AHI1",     "type": "gene" },
+        { "name": "CEP290",   "type": "gene" },
+        { "name": "TMEM67",   "type": "gene" },
+        { "name": "CSPP1",    "type": "gene" },
+        { "name": "TMEM216",  "type": "gene" },
+        { "name": "INPP5E",   "type": "gene" }
+]
+}

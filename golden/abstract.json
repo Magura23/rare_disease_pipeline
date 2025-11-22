@@ -1,0 +1,55 @@
+{
+    "entities": [
+        {
+            "name": "Joubert syndrome",
+            "type": "rare_disease"
+        },
+        {
+            "name": "cerebellar malformation",
+            "type": "phenotype"
+        },
+        {
+            "name": "brainstem malformation",
+            "type": "phenotype"
+        },
+        {
+            "name": "molar tooth sign",
+            "type": "phenotype"
+        },
+        {
+            "name": "molar tooth sign",
+            "type": "phenotype"
+        },
+        { 
+            "name": "liver fibrosis", 
+            "type": "phenotype" 
+        },
+        {
+            "name": "retinal dystrophy", 
+            "type": "phenotype" 
+        },
+        {
+            "name": "chronic kidney disease", 
+            "type": "phenotype"
+        },
+        {
+             "name": "TMEM67", 
+             "type": "gene" 
+        },
+        {
+             "name": "NPHP1",   "type": "gene" 
+        },
+        { 
+            "name": "RPGRIP1L","type": "gene" 
+        },
+        {
+             "name": "TMEM237", "type": "gene" 
+        },
+        {
+             "name": "CEP290",  "type": "gene" 
+        },
+        {
+             "name": "AHI1",    "type": "gene" 
+        }
+    ]
+}

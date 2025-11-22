@@ -1,0 +1,19 @@
+{
+    "entities":[
+            { "name": "acrocallosal syndrome", "type": "rare_disease" },
+
+            { "name": "CC2D2A",  "type": "gene" },
+            { "name": "CPLANE1", "type": "gene" },
+            { "name": "CSPP1",   "type": "gene" },
+            { "name": "CELSR2",  "type": "gene" },
+            { "name": "KIF7",    "type": "gene" },
+
+            { "name": "dysgenesis of the corpus callosum", "type": "phenotype" },
+            { "name": "corpus callosum agenesis",          "type": "phenotype" },
+            { "name": "corpus callosum anomalies",         "type": "phenotype" },
+            { "name": "distal anomalies of limbs",         "type": "phenotype" },
+            { "name": "minor craniofacial anomalies",      "type": "phenotype" },
+            { "name": "intellectual disability",           "type": "phenotype" }
+]
+
+}

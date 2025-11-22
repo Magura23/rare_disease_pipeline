@@ -1,0 +1,20 @@
+{
+    "entities":[
+        { "name": "Joubert syndrome", "type": "rare_disease" },
+
+        { "name": "molar tooth sign", "type": "phenotype" },
+        { "name": "thin superior cerebellar peduncles", "type": "phenotype" },
+        { "name": "vermis hypoplasia", "type": "phenotype" },
+        { "name": "superior cerebellar folial dysplasia", "type": "phenotype" },
+        { "name": "long superior cerebellar peduncles", "type": "phenotype" },
+        { "name": "thick superior cerebellar peduncles", "type": "phenotype" },
+        { "name": "horizontal superior cerebellar peduncles", "type": "phenotype" },
+
+        { "name": "NPHP1",   "type": "gene" },
+        { "name": "SUFU",    "type": "gene" },
+        { "name": "CBY1",    "type": "gene" },
+        { "name": "CPLANE1", "type": "gene" },
+        { "name": "FAM149B1","type": "gene" }
+]
+
+}
