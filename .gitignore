@@ -39,6 +39,22 @@ src/rarekg/curated/working1.ipynb
 src/rarekg/curated/db_construction.py
 
 notebooks/medgemma_setup
-notebooks/server.ipynb
+
 
 vllm
+
+golden/para_0.json
+golden/para_1.json
+golden/para_2.json
+golden/para_3.json
+golden/para_4.json
+golden/para_5.json
+golden/para_6.json
+golden/para_7.json
+golden/para_8.json
+golden/para_9.json
+golden/para_10.json
+golden/para_11.json
+golden/para_12.json
+golden/para_13.json
+golden/para_14.json    
