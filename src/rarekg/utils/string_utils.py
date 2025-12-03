@@ -20,36 +20,50 @@ def normalize_name(name: str) -> str:
    
     s = unicodedata.normalize("NFKC", name)
 
-    # Greek letters to latin words
+
     s = "".join(_GREEK.get(ch, ch) for ch in s)
 
     # Strip diacritics
     s = unicodedata.normalize("NFKD", s)
     s = "".join(c for c in s if not unicodedata.combining(c))
-    # Lowercase
+ 
     s = s.lower()
     
 
-    # Normalize quotes/dashes
+    
     s = (s.replace("’", "'").replace("`", "'").replace("´", "'")
            .replace("–", "-").replace("—", "-").replace("−", "-"))
 
-    # Drop possessive 's (e.g., "joubert's" -> "joubert")
+ 
     s = re.sub(r"\b([a-z0-9]+)'s\b", r"\1", s)
 
-    # Replace non-word punctuation with spaces (keep hyphen for one more step)
+
     s = re.sub(r"[^\w\s-]", " ", s)
 
-    # Hyphens -> spaces
+
     s = s.replace("-", " ")
 
-    # Collapse whitespace
     s = re.sub(r"\s+", " ", s).strip()
 
-    # 'type <roman>' -> 'type <arabic>'
+  
     def _roman_sub(m):
         r = m.group(1).lower()
         return f"type {_ROMAN_TO_INT.get(r, r)}"
     s = re.sub(r"\btype\s+(i|ii|iii|iv|v|vi|vii|viii|ix|x)\b", _roman_sub, s, flags=re.I)
 
     return s
+
+import re
+import unicodedata
+
+def normalize(text: str | None) -> str:
+    if text is None:
+        return ""
+
+    text = unicodedata.normalize("NFC", text)
+
+    text = text.replace("\u00a0", " ")
+
+    text = re.sub(r"\s+", " ", text)
+    
+    return text.strip()
