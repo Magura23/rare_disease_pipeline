@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Literal, Optional, Sequence, Tuple, Union
 import json
 
 from pydantic import BaseModel, Field, ValidationError
@@ -475,7 +475,7 @@ class PhenotypeEntity(BaseModel):
     """Entity for phenotype extraction."""
 
     name: str = Field(..., min_length=1)
-    type: str = Field("phenotype", const=True)
+    type: Literal["phenotype"] = "phenotype"
 
 
 class PhenotypeExtractionResult(BaseModel):
@@ -501,34 +501,37 @@ JSON_SCHEMA_PHENOTYPE: Dict[str, Any] = {
     },
     "additionalProperties": False,
 }
+
 SGR_PHENOTYPE_PROMPT = """
 You are a precise biomedical phenotype extractor.
 Follow the next rules silently, do NOT output any reason.
 
+
 INTERNAL SGR LOOP (keep private; do not output):
 
-1. IDENTIFY phenotypes:
-    – Specific phenotypic abnormalities, either as standalone terms
-      (e.g. "ataxia", "hypotonia") or as compound phrases combining
-      modifiers, anatomical sites and pathological issues (e.g.
-      "cerebellar hypoplasia", "flexion contractures of fingers II–IV").
+1. IDENTIFY phrases that could describe phenotypes
+   - This could be either standlone terms (e.g. "ataxia", "hypotonia") or compound phrases  
+    following the structure: [modifiers] + [anatomical site] + [pathological issue]
+      e.g. "cerebellar hypoplasia", "flexion contractures of fingers II–IV",
+            "abnormally deep interpeduncular fossa".
 
-2. VALIDATE (soft checks; silently discard failures):
-    – Exclude clinical course, inheritance, frequency and unrelated
-      physiological processes.
-    – When a conjunction shares a common head (e.g. "cerebellar and
-      pontine hypoplasia"), split into separate phenotypes by repeating
-      the head with each modifier ("cerebellar hypoplasia" and
-      "pontine hypoplasia").  Similarly, separate coordinated lists
-      such as "difficulty swallowing and speaking clearly" into
-      "difficulty swallowing" and "difficulty speaking clearly".
-    – Do not truncate long descriptive phrases; retain full
-      expressions such as "malformation of the midbrain–hindbrain
-      junction" or "camptodactyly of digits III".
+2. VALIDATE the candidates
+   - Phenotypes are **abnormal clinical features**: signs, symptoms, or structural/functional abnormalities. They should include the full descriptive phrase (modifiers + anatomy + problem) when present, e.g. "cerebellar hypoplasia", "flexion contractures of fingers II–IV".
+The following **are not phenotypes and must be ignored**: 
+– gene or protein names (e.g. GFAP, CASK), sequence variants (e.g. c.617G>A, p.R206H), disease names (e.g. Cystic fibrosis), treatments or drugs, research methods, cells/tissues/organs without an abnormality, demographics.
 
-3. EMIT: 
-    If nothing valid is found, output exactly: {"entities": []}
+4. COORDINATION (AND / OR)
+   - If a shared head is coordinated, split into separate phenotypes by repeating the head:
+       "cerebellar and pontine hypoplasia"
+           → "cerebellar hypoplasia", "pontine hypoplasia".
+       "difficulty swallowing and speaking clearly"
+           → "difficulty swallowing", "difficulty speaking clearly".
+
+5. EMIT
+   - If nothing valid is found, output exactly:
+       {"entities": []}
 """
+
 
 
 # Few‑shot examples for the phenotype task
@@ -549,6 +552,25 @@ FEW_SHOT_PHENOTYPE: Sequence[Dict[str, str]] = [
                     {"name": "pontine hypoplasia", "type": "phenotype"},
                     {"name": "difficulty swallowing", "type": "phenotype"},
                     {"name": "difficulty speaking clearly", "type": "phenotype"},
+                ]
+            }
+        ),
+    },
+     {
+        "role": "user",
+        "content": (
+            "Mutations in BRCA1 cause a markedly increased risk of breast and ovarian "
+            "cancer. Affected individuals often show microcephaly and growth "
+            "retardation in childhood."
+        ),
+    },
+    {
+        "role": "assistant",
+        "content": json.dumps(
+            {
+                "entities": [
+                    {"name": "microcephaly", "type": "phenotype"},
+                    {"name": "growth retardation in childhood", "type": "phenotype"},
                 ]
             }
         ),
@@ -620,7 +642,6 @@ FEW_SHOT_PHENOTYPE: Sequence[Dict[str, str]] = [
             {
                 "entities": [
                     {"name": "retinal pigmentary abnormalities", "type": "phenotype"},
-                    {"name": "congenital muscular dystrophy", "type": "phenotype"},
                     {"name": "spastic paraparesis", "type": "phenotype"},
                 ]
             }
@@ -647,6 +668,18 @@ FEW_SHOT_PHENOTYPE: Sequence[Dict[str, str]] = [
                 ]
             }
         ),
+    },
+    {
+        "role": "user",
+        "content": (
+            "BRCA1 is a tumor suppressor gene important for DNA repair. "
+            "Fibrodysplasia ossificans progressiva is a rare genetic disease. "
+            "Enzyme replacement therapy with imiglucerase is under investigation."
+        ),
+    },
+    {
+        "role": "assistant",
+        "content": json.dumps({"entities": []}),
     },
 ]
 
